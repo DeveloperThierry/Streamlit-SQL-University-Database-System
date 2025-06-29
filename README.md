@@ -2,7 +2,11 @@
 
 A simple web-based application to manage student data, built using **Streamlit** and **MySQL**.
 
+### ER Model
 ![ER Diagram](images/ER%20Model.png)
+
+### Dashboard
+![DB Dashboard](images/DB_dashboard.png)
 
 ## Features
 
