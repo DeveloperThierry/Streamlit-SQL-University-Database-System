@@ -88,7 +88,7 @@ def update_student():
 
                 if cursor.rowcount:
                     st.success("Student information updated successfully!")
-                    del st.session_state["update_data"]  # Clear after update
+                    del st.session_state["update_data"] 
                 else:
                     st.warning("No changes made.")
 
