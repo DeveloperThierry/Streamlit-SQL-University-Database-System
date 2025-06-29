@@ -53,36 +53,48 @@ def update_student():
     st.header("✏️ Update Student Info")
     student_id = st.number_input("Enter Student ID to Update", min_value=1, step=1)
 
-    if st.button("Fetch Current Info"):
+    if st.button("Load Student Info"):
         cursor.execute("SELECT * FROM student WHERE student_id = %s", (student_id,))
         user = cursor.fetchone()
+
         if user:
-            st.write("Current Data:")
-            st.json({
-                "First Name": user[1],
-                "Last Name": user[2],
-                "Email": user[5],
-                "Phone": user[6],
-                "Address": user[3]
-            })
-
-            new_first = st.text_input("New First Name", value=user[1])
-            new_last = st.text_input("New Last Name", value=user[2])
-            new_phone = st.text_input("New Phone", value=user[6])
-            new_address = st.text_input("New Address", value=user[3])
-
-            if st.button("Update Info"):
-                try:
-                    cursor.execute("""
-                        UPDATE student SET first_name=%s, last_name=%s, phone_number=%s, address=%s
-                        WHERE student_id=%s
-                    """, (new_first, new_last, new_phone, new_address, student_id))
-                    conn.commit()
-                    st.success("✅ Student information updated successfully!")
-                except Exception as e:
-                    st.error(f"❌ Error: {str(e)}")
+            st.session_state["update_data"] = {
+                "first_name": user[1],
+                "last_name": user[2],
+                "address": user[3],
+                "phone_number": user[4],
+                "email": user[5],
+                "dob": str(user[6])
+            }
         else:
             st.error("❌ Student not found.")
+
+    if "update_data" in st.session_state:
+        st.subheader("Update Fields Below")
+
+        new_first = st.text_input("First Name", value=st.session_state["update_data"]["first_name"])
+        new_last = st.text_input("Last Name", value=st.session_state["update_data"]["last_name"])
+        new_address = st.text_input("Address", value=st.session_state["update_data"]["address"])
+        new_phone = st.text_input("Phone", value=st.session_state["update_data"]["phone_number"])
+
+        if st.button("Update Info"):
+            try:
+                cursor.execute("""
+                    UPDATE student 
+                    SET first_name = %s, last_name = %s, address = %s, phone_number = %s
+                    WHERE student_id = %s
+                """, (new_first, new_last, new_address, new_phone, student_id))
+                conn.commit()
+
+                if cursor.rowcount:
+                    st.success("✅ Student information updated successfully!")
+                    del st.session_state["update_data"]  # Clear after update
+                else:
+                    st.warning("⚠️ No changes made.")
+
+            except Exception as e:
+                st.error(f"❌ Error: {str(e)}")
+
 
 
 def delete_student():
