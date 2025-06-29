@@ -12,12 +12,12 @@ cursor = conn.cursor()
 
 
 def register():
-    st.header("📝 Register Student")
+    st.header("Register Student")
     first_name = st.text_input("First Name")
     last_name = st.text_input("Last Name")
     email = st.text_input("Email")
     password = st.text_input("Password", type="password")
-    dob = st.date_input("Date of Birth")
+    date_of_birth = st.date_input("Date of Birth")
     address = st.text_input("Address")
     phone = st.text_input("Phone Number")
 
@@ -26,16 +26,16 @@ def register():
             cursor.execute("""
                 INSERT INTO student (first_name, last_name, email, password, date_of_birth, address, phone_number)
                 VALUES (%s, %s, %s, %s, %s, %s, %s)
-            """, (first_name, last_name, email, password, dob, address, phone))
+            """, (first_name, last_name, email, password, date_of_birth, address, phone))
             conn.commit()
             student_id = cursor.lastrowid
-            st.success(f"✅ Registration successful! Your Student ID is: {student_id}")
+            st.success(f"Registration successful! Your Student ID is: {student_id}")
         except Exception as e:
-            st.error(f"❌ Error: {str(e)}")
+            st.error(f"Error: {str(e)}")
 
 
 def login():
-    st.header("🔐 Student Login")
+    st.header("Student Login")
     email = st.text_input("Email")
     password = st.text_input("Password", type="password")
 
@@ -43,14 +43,14 @@ def login():
         cursor.execute("SELECT * FROM student WHERE email = %s AND password = %s", (email, password))
         user = cursor.fetchone()
         if user:
-            st.success(f"✅ Welcome, {user[1]} {user[2]}!")
+            st.success(f"Welcome, {user[1]} {user[2]}!")
             st.write("Your Student ID:", user[0])
         else:
-            st.error("❌ Invalid email or password.")
+            st.error("Invalid email or password.")
 
 
 def update_student():
-    st.header("✏️ Update Student Info")
+    st.header("Update Student Info")
     student_id = st.number_input("Enter Student ID to Update", min_value=1, step=1)
 
     if st.button("Load Student Info"):
@@ -64,10 +64,10 @@ def update_student():
                 "address": user[3],
                 "phone_number": user[4],
                 "email": user[5],
-                "dob": str(user[6])
+                "date_of_birth": str(user[6])
             }
         else:
-            st.error("❌ Student not found.")
+            st.error("Student not found.")
 
     if "update_data" in st.session_state:
         st.subheader("Update Fields Below")
@@ -87,18 +87,17 @@ def update_student():
                 conn.commit()
 
                 if cursor.rowcount:
-                    st.success("✅ Student information updated successfully!")
+                    st.success("Student information updated successfully!")
                     del st.session_state["update_data"]  # Clear after update
                 else:
-                    st.warning("⚠️ No changes made.")
+                    st.warning("No changes made.")
 
             except Exception as e:
-                st.error(f"❌ Error: {str(e)}")
-
+                st.error(f"Error: {str(e)}")
 
 
 def delete_student():
-    st.header("🗑️ Delete Student")
+    st.header("Delete Student")
     student_id = st.number_input("Enter Student ID to Delete", min_value=1, step=1)
 
     if st.button("Delete"):
@@ -106,22 +105,21 @@ def delete_student():
             cursor.execute("DELETE FROM student WHERE student_id = %s", (student_id,))
             conn.commit()
             if cursor.rowcount:
-                st.success("✅ Student deleted successfully!")
+                st.success("Student deleted successfully!")
             else:
-                st.warning("⚠️ No student found with that ID.")
+                st.warning("No student found with that ID.")
         except Exception as e:
-            st.error(f"❌ Error: {str(e)}")
-
+            st.error(f"Error: {str(e)}")
 
 
 def view_students():
-    st.header("📄 All Registered Students")
+    st.header("All Registered Students")
     cursor.execute("SELECT student_id, first_name, last_name, email FROM student")
     data = cursor.fetchall()
 
     if data:
         for row in data:
-            st.write(f"🧑 ID: {row[0]}, Name: {row[1]} {row[2]}, Email: {row[3]}")
+            st.write(f"ID: {row[0]}, Name: {row[1]} {row[2]}, Email: {row[3]}")
     else:
         st.info("No students found.")
 
@@ -139,4 +137,3 @@ elif option == "Delete Student":
     delete_student()
 elif option == "View All Students":
     view_students()
-
